@@ -73,6 +73,10 @@ public class UserController {
     @GetMapping("/hello")
     public String hello(){
 //        Person person = new Person("fred",1);
+
+        logger.info("person object - {}",this.person);
+        person.id=1;
+        person.name="fred";
         logger.info("person object - {}",this.person);
         return "hello";
     }

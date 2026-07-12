@@ -12,3 +12,14 @@ public class Jbdl95IocDiApplication {
     }
 
 }
+/*
+*
+* Bean:-
+* Object inside ioc container
+*
+*
+* spring follows partial singleton( it does not stop you from crdeating the obj)
+*  Creating shared instance of singleton bean 'person' (scope of a object inside ioc container)
+* Creating shared instance of singleton bean 'userController'
+* Creating shared instance of singleton bean 'jbdl95IocDiApplication'
+* */
