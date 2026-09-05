@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.util.Date;
 
 //jpa bidirectional mapping
@@ -17,7 +18,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Book {
+public class Book implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +38,7 @@ public class Book {
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnoreProperties("books")
     private Student student;
 
     @CreationTimestamp

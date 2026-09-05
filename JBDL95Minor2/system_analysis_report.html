@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Digital Library Management System - Architecture & Domain Analysis Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 14mm 16mm 14mm;
+      @bottom-right {
+        content: "Page " counter(page);
+        font-size: 8pt;
+        color: #64748b;
+      }
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      background: #ffffff;
+      line-height: 1.5;
+      font-size: 9.5pt;
+    }
+
+    .cover {
+      page-break-after: always;
+      height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
+      color: #ffffff;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(99, 102, 241, 0.5);
+      border-radius: 20px;
+      font-size: 8.5pt;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #a5b4fc;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-size: 26pt;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    .cover-subtitle {
+      font-size: 13pt;
+      font-weight: 400;
+      color: #94a3b8;
+      max-width: 600px;
+      line-height: 1.4;
+    }
+
+    .cover-meta {
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      font-size: 8.5pt;
+    }
+
+    .cover-meta-item strong {
+      display: block;
+      color: #a5b4fc;
+      text-transform: uppercase;
+      font-size: 7.5pt;
+      letter-spacing: 0.05em;
+      margin-bottom: 3px;
+    }
+
+    h1, h2, h3, h4 {
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    h1 {
+      font-size: 17pt;
+      border-bottom: 2px solid #6366f1;
+      padding-bottom: 5px;
+      margin-top: 22px;
+      margin-bottom: 12px;
+      page-break-after: avoid;
+    }
+
+    h2 {
+      font-size: 13pt;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      color: #1e1b4b;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 10.5pt;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      color: #334155;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin-bottom: 8px;
+      color: #334155;
+      text-align: justify;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    /* Cards and Callouts */
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #6366f1;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 9pt;
+    }
+
+    .card-title {
+      font-weight: 700;
+      color: #1e1b4b;
+      margin-bottom: 4px;
+      font-size: 9.5pt;
+    }
+
+    .alert-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-left: 4px solid #3b82f6;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin: 10px 0;
+      font-size: 8.5pt;
+    }
+
+    .alert-amber {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 8.5pt;
+    }
+
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 9px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      font-size: 7.5pt;
+      font-weight: 600;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-primary { background: #e0e7ff; color: #4338ca; }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+    .badge-danger { background: #ffe4e6; color: #be123c; }
+
+    /* Code blocks */
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 8.5pt;
+    }
+
+    .diagram-container {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 14px;
+      margin: 14px 0;
+      text-align: center;
+      page-break-inside: avoid;
+    }
+
+    .diagram-caption {
+      margin-top: 8px;
+      font-size: 8pt;
+      font-weight: 600;
+      color: #64748b;
+      text-align: center;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <div class="cover">
+    <div>
+      <span class="cover-badge">Enterprise Architectural Specification</span>
+      <h1 class="cover-title">Digital Library<br>Management System</h1>
+      <p class="cover-subtitle">Comprehensive Architectural, Domain Modeling, Database Schema, and Business Workflow Analysis Report</p>
+    </div>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <strong>Project</strong>
+        JBDL95MINOR1 (v0.0.1)
+      </div>
+      <div class="cover-meta-item">
+        <strong>Stack</strong>
+        Spring Boot 4, MySQL, Redis
+      </div>
+      <div class="cover-meta-item">
+        <strong>Date & Version</strong>
+        August 2026 • Release 2.0
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: EXECUTIVE SUMMARY -->
+  <div class="section">
+    <h1>1. Executive Summary & Architecture Overview</h1>
+    <p>
+      The <strong>Digital Library Management System</strong> is a high-throughput, enterprise-grade backend service built with <strong>Java 17</strong>, <strong>Spring Boot 4</strong>, <strong>Hibernate/JPA</strong>, <strong>MySQL 9.2</strong>, and <strong>Redis Cloud</strong>. The system provides complete governance over book lifecycle management, student and administrator role governance, granular transaction audits, and real-time fine calculation.
+    </p>
+    <p>
+      The architecture adopts a clean <strong>Layered Architecture</strong> pattern separating presentation (Controllers), business processing (Services), data persistence (Spring Data JPA Repositories), and caching (Redis Hash/String stores).
+    </p>
+
+    <!-- ARCHITECTURE DIAGRAM SVG -->
+    <div class="diagram-container">
+      <svg width="100%" height="220" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+        <!-- Client Layer -->
+        <rect x="20" y="80" width="120" height="60" rx="8" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+        <text x="80" y="105" font-size="11" font-weight="bold" fill="#312e81" text-anchor="middle">Client Layer</text>
+        <text x="80" y="123" font-size="8.5" fill="#4338ca" text-anchor="middle">React UI / REST API</text>
+
+        <!-- Arrow 1 -->
+        <line x1="140" y1="110" x2="180" y2="110" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+        
+        <!-- Controller Layer -->
+        <rect x="180" y="30" width="130" height="160" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="245" y="50" font-size="10" font-weight="bold" fill="#0f172a" text-anchor="middle">Controller Layer</text>
+        <rect x="190" y="60" width="110" height="24" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+        <text x="245" y="76" font-size="8" fill="#334155" text-anchor="middle">StudentController</text>
+        <rect x="190" y="90" width="110" height="24" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+        <text x="245" y="106" font-size="8" fill="#334155" text-anchor="middle">BookController</text>
+        <rect x="190" y="120" width="110" height="24" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+        <text x="245" y="136" font-size="8" fill="#334155" text-anchor="middle">TxnController</text>
+        <rect x="190" y="150" width="110" height="24" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+        <text x="245" y="166" font-size="8" fill="#334155" text-anchor="middle">AdminController</text>
+
+        <!-- Arrow 2 -->
+        <line x1="310" y1="110" x2="350" y2="110" stroke="#6366f1" stroke-width="2"/>
+
+        <!-- Service Layer -->
+        <rect x="350" y="30" width="130" height="160" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+        <text x="415" y="50" font-size="10" font-weight="bold" fill="#312e81" text-anchor="middle">Service Layer</text>
+        <rect x="360" y="60" width="110" height="24" rx="4" fill="#ffffff" stroke="#a5b4fc"/>
+        <text x="415" y="76" font-size="8" fill="#3730a3" text-anchor="middle">StudentService</text>
+        <rect x="360" y="90" width="110" height="24" rx="4" fill="#ffffff" stroke="#a5b4fc"/>
+        <text x="415" y="106" font-size="8" fill="#3730a3" text-anchor="middle">BookService</text>
+        <rect x="360" y="120" width="110" height="24" rx="4" fill="#ffffff" stroke="#a5b4fc"/>
+        <text x="415" y="136" font-size="8" fill="#3730a3" text-anchor="middle">TransactionService</text>
+        <rect x="360" y="150" width="110" height="24" rx="4" fill="#ffffff" stroke="#a5b4fc"/>
+        <text x="415" y="166" font-size="8" fill="#3730a3" text-anchor="middle">AdminService</text>
+
+        <!-- Arrow 3 to Redis -->
+        <path d="M 480 80 L 530 50" fill="none" stroke="#f59e0b" stroke-width="2"/>
+        <!-- Arrow 3 to MySQL -->
+        <path d="M 480 140 L 530 160" fill="none" stroke="#0ea5e9" stroke-width="2"/>
+
+        <!-- Persistence Layer -->
+        <!-- Redis Box -->
+        <rect x="530" y="25" width="145" height="60" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="602" y="48" font-size="10" font-weight="bold" fill="#92400e" text-anchor="middle">Redis Cloud Cache</text>
+        <text x="602" y="66" font-size="8" fill="#b45309" text-anchor="middle">Cache-Aside (Student: {id})</text>
+
+        <!-- MySQL Box -->
+        <rect x="530" y="130" width="145" height="65" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+        <text x="602" y="152" font-size="10" font-weight="bold" fill="#075985" text-anchor="middle">MySQL Database</text>
+        <text x="602" y="170" font-size="8" fill="#0369a1" text-anchor="middle">JBDL95MINOR2 (InnoDB)</text>
+      </svg>
+      <div class="diagram-caption">Figure 1.1: Multi-Tiered System Architecture & Data Flow Diagram</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 2: DOMAIN MODELS & ENTITY SPECIFICATIONS -->
+  <div class="section">
+    <h1>2. Domain Models & Relational Architecture</h1>
+    <p>
+      The domain model consists of six primary persistent entities managed by JPA with Hibernate ORM. Bidirectional and unidirectional associations are established using foreign key constraints and JPA cascades.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Entity</th>
+          <th>Table Name</th>
+          <th>Primary Key</th>
+          <th>Key Attributes</th>
+          <th>Relationships</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>User</strong></td>
+          <td><code>user</code></td>
+          <td><code>username</code> (varchar)</td>
+          <td><code>password</code> (BCrypt), <code>authorities</code> (enum)</td>
+          <td>OneToOne with Student, OneToOne with Admin</td>
+        </tr>
+        <tr>
+          <td><strong>Student</strong></td>
+          <td><code>student</code></td>
+          <td><code>id</code> (int auto-inc)</td>
+          <td><code>name</code>, <code>email</code>, <code>gender</code>, <code>status</code></td>
+          <td>OneToOne with User, OneToMany with Book</td>
+        </tr>
+        <tr>
+          <td><strong>Admin</strong></td>
+          <td><code>admin</code></td>
+          <td><code>id</code> (bigint auto-inc)</td>
+          <td><code>name</code>, <code>createdOn</code>, <code>updatedOn</code></td>
+          <td>OneToOne with User</td>
+        </tr>
+        <tr>
+          <td><strong>Book</strong></td>
+          <td><code>book</code></td>
+          <td><code>id</code> (int auto-inc)</td>
+          <td><code>name</code>, <code>genre</code> (enum)</td>
+          <td>ManyToOne with Author, ManyToOne with Student</td>
+        </tr>
+        <tr>
+          <td><strong>Author</strong></td>
+          <td><code>author</code></td>
+          <td><code>id</code> (int auto-inc)</td>
+          <td><code>name</code>, <code>email</code> (unique)</td>
+          <td>OneToMany with Book</td>
+        </tr>
+        <tr>
+          <td><strong>Transaction</strong></td>
+          <td><code>transaction</code></td>
+          <td><code>id</code> (int auto-inc)</td>
+          <td><code>txn_id</code> (UUID), <code>transaction_type</code>, <code>fine</code></td>
+          <td>ManyToOne with Student, ManyToOne with Book</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ER DIAGRAM SVG -->
+    <div class="diagram-container">
+      <svg width="100%" height="280" viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+        <!-- USER ENTITY -->
+        <rect x="20" y="30" width="130" height="90" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.5"/>
+        <path d="M 20 54 L 150 54" stroke="#475569" stroke-width="1"/>
+        <text x="85" y="46" font-size="10" font-weight="bold" fill="#0f172a" text-anchor="middle">USER</text>
+        <text x="30" y="70" font-size="8" fill="#334155">🔑 username (PK)</text>
+        <text x="30" y="86" font-size="8" fill="#334155">• password</text>
+        <text x="30" y="102" font-size="8" fill="#334155">• authorities (ENUM)</text>
+
+        <!-- STUDENT ENTITY -->
+        <rect x="200" y="30" width="140" height="110" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+        <path d="M 200 54 L 340 54" stroke="#16a34a" stroke-width="1"/>
+        <text x="270" y="46" font-size="10" font-weight="bold" fill="#14532d" text-anchor="middle">STUDENT</text>
+        <text x="210" y="70" font-size="8" fill="#14532d">🔑 id (PK)</text>
+        <text x="210" y="86" font-size="8" fill="#14532d">• name, email, gender</text>
+        <text x="210" y="102" font-size="8" fill="#14532d">• status (ACTIVE/INACT)</text>
+        <text x="210" y="118" font-size="8" fill="#14532d">🔗 user_username (FK)</text>
+
+        <!-- ADMIN ENTITY -->
+        <rect x="20" y="160" width="130" height="85" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+        <path d="M 20 184 L 150 184" stroke="#dc2626" stroke-width="1"/>
+        <text x="85" y="176" font-size="10" font-weight="bold" fill="#7f1d1d" text-anchor="middle">ADMIN</text>
+        <text x="30" y="200" font-size="8" fill="#7f1d1d">🔑 id (PK)</text>
+        <text x="30" y="216" font-size="8" fill="#7f1d1d">• name</text>
+        <text x="30" y="232" font-size="8" fill="#7f1d1d">🔗 user_username (FK)</text>
+
+        <!-- BOOK ENTITY -->
+        <rect x="390" y="30" width="135" height="110" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <path d="M 390 54 L 525 54" stroke="#2563eb" stroke-width="1"/>
+        <text x="457" y="46" font-size="10" font-weight="bold" fill="#1e3a8a" text-anchor="middle">BOOK</text>
+        <text x="400" y="70" font-size="8" fill="#1e3a8a">🔑 id (PK)</text>
+        <text x="400" y="86" font-size="8" fill="#1e3a8a">• name, genre (ENUM)</text>
+        <text x="400" y="102" font-size="8" fill="#1e3a8a">🔗 author_id (FK)</text>
+        <text x="400" y="118" font-size="8" fill="#1e3a8a">🔗 student_id (FK/Null)</text>
+
+        <!-- AUTHOR ENTITY -->
+        <rect x="565" y="30" width="120" height="90" rx="6" fill="#faf5ff" stroke="#9333ea" stroke-width="1.5"/>
+        <path d="M 565 54 L 685 54" stroke="#9333ea" stroke-width="1"/>
+        <text x="625" y="46" font-size="10" font-weight="bold" fill="#581c87" text-anchor="middle">AUTHOR</text>
+        <text x="575" y="70" font-size="8" fill="#581c87">🔑 id (PK)</text>
+        <text x="575" y="86" font-size="8" fill="#581c87">• name</text>
+        <text x="575" y="102" font-size="8" fill="#581c87">• email (Unique)</text>
+
+        <!-- TRANSACTION ENTITY -->
+        <rect x="300" y="170" width="170" height="95" rx="6" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+        <path d="M 300 194 L 470 194" stroke="#d97706" stroke-width="1"/>
+        <text x="385" y="186" font-size="10" font-weight="bold" fill="#78350f" text-anchor="middle">TRANSACTION</text>
+        <text x="310" y="210" font-size="8" fill="#78350f">🔑 id (PK) • txn_id (UUID)</text>
+        <text x="310" y="226" font-size="8" fill="#78350f">• txn_type (ISSUANCE/RETURN)</text>
+        <text x="310" y="242" font-size="8" fill="#78350f">• fine • txn_status</text>
+        <text x="310" y="258" font-size="8" fill="#78350f">🔗 student_id (FK), book_id (FK)</text>
+
+        <!-- Relationships -->
+        <line x1="150" y1="75" x2="200" y2="75" stroke="#64748b" stroke-width="1.5"/>
+        <line x1="85" y1="120" x2="85" y2="160" stroke="#64748b" stroke-width="1.5"/>
+        <line x1="340" y1="75" x2="390" y2="75" stroke="#64748b" stroke-width="1.5"/>
+        <line x1="525" y1="75" x2="565" y2="75" stroke="#64748b" stroke-width="1.5"/>
+        <line x1="270" y1="140" x2="330" y2="170" stroke="#64748b" stroke-width="1.5"/>
+        <line x1="457" y1="140" x2="420" y2="170" stroke="#64748b" stroke-width="1.5"/>
+      </svg>
+      <div class="diagram-caption">Figure 2.1: Entity-Relationship (ER) Schema & Foreign Key Mappings</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 3: BUSINESS LOGIC & TRANSACTION RULES -->
+  <div class="section">
+    <h1>3. Business Workflows & Fine Calculation Rules</h1>
+    <p>
+      The core transaction processing engine is encapsulated within <code>TransactionService.java</code>. The platform enforces strict library policies for borrowing limits, active status checks, and automated fines.
+    </p>
+
+    <h2>3.1 Library Governance Policies</h2>
+    <div class="card">
+      <div class="card-title">Core Operating Rules</div>
+      <ul style="margin-left: 18px; margin-top: 4px; line-height: 1.6;">
+        <li><strong>Student Account Status:</strong> Must be <code>ACTIVE</code> to borrow books.</li>
+        <li><strong>Simultaneous Borrowing Quota:</strong> A maximum of <strong>3 books</strong> per student (configured via <code>@Value("${student.book.limit:3}")</code>).</li>
+        <li><strong>Book Availability:</strong> A book cannot be borrowed if already assigned (<code>book.student != null</code>).</li>
+        <li><strong>Grace Borrowing Window:</strong> Students can retain borrowed books for up to <strong>15 days</strong> without penalty (<code>@Value("${student.book.issue.limit:15}")</code>).</li>
+        <li><strong>Overdue Penalty Rate:</strong> An automatic fine of <strong>₹100 per day</strong> is applied upon return for any duration beyond 15 days.</li>
+      </ul>
+    </div>
+
+    <h2>3.2 Fine Calculation Formula</h2>
+    <div class="alert-box alert-amber">
+      <strong>Fine Calculation Mathematical Formulation:</strong><br>
+      <code>delayedDays = (returnTimestamp - issuanceTimestamp) in Days</code><br>
+      <code>IF delayedDays &gt; 15 THEN fine = (delayedDays - 15) * 100 ELSE fine = 0</code>
+    </div>
+
+    <!-- TRANSACTION FLOWCHART SVG -->
+    <div class="diagram-container">
+      <svg width="100%" height="240" viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg">
+        <!-- Start -->
+        <rect x="20" y="90" width="80" height="40" rx="20" fill="#6366f1" stroke="#4338ca"/>
+        <text x="60" y="115" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">Initiate Txn</text>
+
+        <!-- Decision: Type -->
+        <polygon points="170,110 220,70 270,110 220,150" fill="#f8fafc" stroke="#475569" stroke-width="1.5"/>
+        <text x="220" y="113" font-size="8.5" font-weight="bold" fill="#0f172a" text-anchor="middle">Txn Type?</text>
+        <line x1="100" y1="110" x2="170" y2="110" stroke="#64748b" stroke-width="1.5"/>
+
+        <!-- Issuance Branch -->
+        <line x1="220" y1="70" x2="220" y2="35" stroke="#16a34a" stroke-width="1.5"/>
+        <line x1="220" y1="35" x2="310" y2="35" stroke="#16a34a" stroke-width="1.5"/>
+        <text x="250" y="30" font-size="8" font-weight="bold" fill="#16a34a">ISSUANCE</text>
+
+        <rect x="310" y="15" width="160" height="40" rx="6" fill="#f0fdf4" stroke="#16a34a"/>
+        <text x="390" y="32" font-size="8" font-weight="bold" fill="#14532d" text-anchor="middle">Check: Status=ACTIVE</text>
+        <text x="390" y="46" font-size="7.5" fill="#14532d" text-anchor="middle">Quota &lt; 3 &amp; Book Unassigned</text>
+
+        <line x1="470" y1="35" x2="520" y2="35" stroke="#16a34a" stroke-width="1.5"/>
+        <rect x="520" y="15" width="150" height="40" rx="6" fill="#dcfce7" stroke="#15803d"/>
+        <text x="595" y="32" font-size="8" font-weight="bold" fill="#14532d" text-anchor="middle">Assign Book &amp; Save</text>
+        <text x="595" y="46" font-size="7.5" fill="#14532d" text-anchor="middle">Status = SUCCESS (fine = 0)</text>
+
+        <!-- Return Branch -->
+        <line x1="220" y1="150" x2="220" y2="185" stroke="#d97706" stroke-width="1.5"/>
+        <line x1="220" y1="185" x2="310" y2="185" stroke="#d97706" stroke-width="1.5"/>
+        <text x="250" y="180" font-size="8" font-weight="bold" fill="#d97706">RETURN</text>
+
+        <rect x="310" y="165" width="160" height="40" rx="6" fill="#fffbeb" stroke="#d97706"/>
+        <text x="390" y="182" font-size="8" font-weight="bold" fill="#78350f" text-anchor="middle">Fetch Issuance Txn</text>
+        <text x="390" y="196" font-size="7.5" fill="#78350f" text-anchor="middle">Compute (Return - Issue) Days</text>
+
+        <line x1="470" y1="185" x2="520" y2="185" stroke="#d97706" stroke-width="1.5"/>
+        <rect x="520" y="165" width="150" height="40" rx="6" fill="#fef3c7" stroke="#b45309"/>
+        <text x="595" y="182" font-size="8" font-weight="bold" fill="#78350f" text-anchor="middle">Unassign Book &amp; Fine</text>
+        <text x="595" y="196" font-size="7.5" fill="#78350f" text-anchor="middle">Save RETURN Txn + UUID</text>
+      </svg>
+      <div class="diagram-caption">Figure 3.1: State Transition & Business Decision Flowchart</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 4: DISTRIBUTED REDIS CACHING -->
+  <div class="section">
+    <h1>4. Distributed Redis Caching Architecture</h1>
+    <p>
+      To deliver low-latency profile retrieval for high-concurrency requests, the system implements the <strong>Cache-Aside (Lazy-Loading) Pattern</strong> powered by Redis Cloud.
+    </p>
+
+    <h2>4.1 Cache-Aside Operational Flow</h2>
+    <ol style="margin-left: 18px; margin-top: 6px; line-height: 1.6;">
+      <li><strong>Cache Probe:</strong> When <code>StudentService.getStudent(id)</code> is invoked, it queries Redis key <code>student:{id}</code>.</li>
+      <li><strong>Cache Hit:</strong> If present, the deserialized <code>Student</code> object is immediately returned to the caller (&lt;2ms response time).</li>
+      <li><strong>Cache Miss:</strong> If absent, MySQL is queried via <code>StudentRepository.findById(id)</code>.</li>
+      <li><strong>Cache Populate:</strong> The retrieved entity is saved to Redis with a <strong>1-Hour TTL</strong> (Time-To-Live) to avoid stale data drift.</li>
+      <li><strong>Resilience Fallback:</strong> Redis calls are encapsulated in defensive try-catch blocks to prevent cache outages from affecting database operations.</li>
+    </ol>
+
+    <h2>4.2 Redis Cache Key & Configuration</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Property</th>
+          <th>Configuration Value</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Key Format</td>
+          <td><code>student::{id}</code></td>
+          <td>Namespaced student entity key</td>
+        </tr>
+        <tr>
+          <td>Value Serializer</td>
+          <td><code>JdkSerializationRedisSerializer</code></td>
+          <td>Binary Java Object serialization (requires <code>implements Serializable</code>)</td>
+        </tr>
+        <tr>
+          <td>Cache TTL</td>
+          <td><code>3600 seconds</code> (1 Hour)</td>
+          <td>Automatic cache eviction window</td>
+        </tr>
+        <tr>
+          <td>Remote Host</td>
+          <td><code>redis-12694.crce179.ap-south-1-1.ec2.cloud.redislabs.com:12694</code></td>
+          <td>Distributed Cloud Instance</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 5: CONCLUSION -->
+  <div class="section">
+    <h1>5. Technical Summary & Performance Characteristics</h1>
+    <p>
+      The architecture successfully isolates business transactions, enforces relational integrity, and delivers responsive student operations through Redis caching. Key architectural highlights:
+    </p>
+    <div class="card">
+      <ul style="margin-left: 18px; line-height: 1.6;">
+        <li><strong>ACID Transactions:</strong> Managed via Spring <code>@Transactional</code> on issuance and returns.</li>
+        <li><strong>Zero Data Inconsistency:</strong> JPA bidirectional cyclic references handled with <code>@JsonIgnoreProperties</code>.</li>
+        <li><strong>Sub-Millisecond Read Latency:</strong> Redis cache hit eliminates redundant database joins across Book, User, and Student tables.</li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>

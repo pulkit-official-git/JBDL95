@@ -9,6 +9,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -18,19 +19,20 @@ import lombok.*;
 @Builder
 public class CreateStudentRequest {
 
-    @NotBlank
+    @NotBlank(message = "Username cannot be blank")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "Password cannot be blank")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "Name cannot be blank")
     private String name;
 
-    @Email
+    @NotBlank(message = "Email cannot be blank")
+    @Email(message = "Please provide a valid email address")
     private String email;
 
-    @NonNull
+    @NotNull(message = "Gender must be specified (MALE, FEMALE, OTHERS)")
     private Gender gender;
 
     public Student toStudent(){

@@ -56,27 +56,32 @@ public class StudentService {
 
     public GetStudentResponse getStudent(Integer id) {
 
-//        hit
-        Student student = this.redisRepository.get(id);
-
-        if(student != null) {
-            return GetStudentResponse.builder()
-                    .student(student)
-                    .build();
+        // Cache hit attempt
+        try {
+            Student student = this.redisRepository.get(id);
+            if(student != null) {
+                return GetStudentResponse.builder()
+                        .student(student)
+                        .build();
+            }
+        } catch (Exception e) {
+            // Log or ignore cache read failure and fallback to DB
         }
 
-//         miss
-
-        student = this.studentRepository.findById(id).orElse(null);
+        // Cache miss -> DB lookup
+        Student student = this.studentRepository.findById(id).orElse(null);
 
         if(student != null) {
-            this.redisRepository.create(student);
+            try {
+                this.redisRepository.create(student);
+            } catch (Exception e) {
+                // Log or ignore cache write failure without failing the response
+            }
         }
 
         return GetStudentResponse.builder()
                 .student(student)
                 .build();
-
     }
 
     public Student merge(Student incomingStudent, Student existingStudent){

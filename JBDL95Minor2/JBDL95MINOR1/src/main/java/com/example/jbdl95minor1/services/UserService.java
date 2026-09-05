@@ -22,10 +22,16 @@ public class UserService implements UserDetailsService {
 
 
     public User createUser(User user, Authority authority){
-
+        if (this.userRepository.existsById(user.getUsername())) {
+            throw new IllegalArgumentException("Username '" + user.getUsername() + "' is already registered. Please sign in or use a different username.");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setAuthorities(authority);
         return this.userRepository.save(user);
+    }
+
+    public boolean existsByUsername(String username) {
+        return this.userRepository.existsById(username);
     }
 
     @Override

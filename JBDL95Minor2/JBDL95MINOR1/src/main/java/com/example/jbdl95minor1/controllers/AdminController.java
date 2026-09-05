@@ -3,6 +3,7 @@ package com.example.jbdl95minor1.controllers;
 import com.example.jbdl95minor1.dtos.CreateAdminRequest;
 import com.example.jbdl95minor1.models.Admin;
 import com.example.jbdl95minor1.services.AdminService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,7 @@ public class AdminController {
     AdminService adminService;
 
     @PostMapping("/create")
-    public Long createAdmin(@RequestBody CreateAdminRequest createAdminRequest) {
+    public Long createAdmin(@Valid @RequestBody CreateAdminRequest createAdminRequest) {
         return this.adminService.createAdmin(createAdminRequest.toAdmin());
     }
 
